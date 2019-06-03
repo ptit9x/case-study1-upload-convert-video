@@ -4,6 +4,7 @@ import Cookie from 'js-cookie';
 import Navbar from "./Navbar";
 import Uploader from "./Uploader";
 import Encoder from "./Encoder";
+import History from "./History";
 import './App.scss';
 
 console.log(Cookie('_uid'));
@@ -54,6 +55,8 @@ class App extends Component {
                         }
                     </div>
                 )}/>
+
+                <Route exact path="/encodes" component={History}/>
             </div>
         );
     }

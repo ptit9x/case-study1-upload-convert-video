@@ -12,6 +12,12 @@ class Navbar extends Component {
                             to={'/'}
                             className='logo'><h2>case study 1</h2>
                         </Link>
+
+                        <Link
+                            to={'/encodes'}
+                            className='button'>
+                            Convert History
+                        </Link>
                     </div>
                 </header>
             </div>

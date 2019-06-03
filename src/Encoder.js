@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import {Component} from 'react';
 import toastr from 'toastr';
 import "./Encoder.scss";
@@ -16,12 +16,12 @@ export default class Encoder extends Component {
             convert: props.convert,
             frames: 0,
             kbps: 0,
+            progress: 0
         }
     }
 
     componentDidMount(){
-        this.socket = socketIOClient('ws://127.0.0.1:'+location.port);
-
+        this.socket = socketIOClient();
         this.socket.emit('encode', {
             file : this.state.file,
             user : Cookie('_uid'),
@@ -35,13 +35,15 @@ export default class Encoder extends Component {
         this.socket.on('progress', function (data) {
             this.setState({
                 frames : data.frames,
-                kbps: data.currentKbps
+                kbps: data.currentKbps,
+                progress: 90
             });
         }.bind(this));
 
         this.socket.on('complete', function (data) {
             this.setState({
-                encoded_file : data.encoded_file
+                encoded_file : data.encoded_file,
+                progress: 100
             });
             toastr.success('Converted!');
         }.bind(this));
@@ -65,7 +67,7 @@ export default class Encoder extends Component {
                         Kbps : {this.state.kbps ? this.state.kbps : 'calculating ... ' }
                     </small>
                 </h3>
-                {/* <Progress title="" progress={this.state.progress}/> */}
+                <Progress title="" progress={this.state.progress}/>
 
                 {this.state.encoded_file ? (
                     <div>
