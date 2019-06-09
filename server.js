@@ -5,12 +5,20 @@ const io = require('socket.io')(server);
 const multer  = require('multer');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const cookieMiddleware = require('./middleware/userCookie');
 const fs = require('fs');
 const config = require('config');
 const PORT = config.get('port');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
 const ffmpeg = require('fluent-ffmpeg');
+
+const cookieMiddleware = require('./middleware/userCookie');
+const RabbitClient = require('./servers/lib/rabbitmq');
+const rabbitConfig = require('./config/index');
+
+// queue
+const convertVideo = require('./convertVideo');
+const pushtoS3 = require('./pushVideoS3');
+
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
@@ -86,6 +94,7 @@ app.get('*', (req, res) => {
 let moveUploadedFileToUserDir = (upload_path, move_path, filename, res) =>{
     fs.rename(upload_path, move_path, (err) => {
         if (err) throw err;
+        RabbitClient.publish(filename, rabbitConfig.amqp.PATH_UPLOADED_VIDEO);
         res.json({
             uploaded : true,
             path : filename
